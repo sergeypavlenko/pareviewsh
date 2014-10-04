@@ -103,35 +103,35 @@ if [ -z "$PHP_FILES" ]; then
   CODE_FILES="."
   NON_TPL_FILES="."
 fi
-echo "<ul>"
+echo "<ul class='reports'>"
 
 # README.txt present?
 if [ ! -e README.txt ] && [ ! -e README.md ] ; then
-  echo "<li>README.txt or README.md is missing, see the <a href=\"https://www.drupal.org/node/447604\">guidelines for in-project documentation</a>.</li>"
+  echo "<li><span>README.txt or README.md is missing, see the <a href=\"https://www.drupal.org/node/447604\">guidelines for in-project documentation</a>.</span></li>"
 fi
 # LICENSE.txt present?
 if [ -e LICENSE.txt ]; then
-  echo "<li>Remove LICENSE.txt, it will be added by drupal.org packaging automatically.</li>"
+  echo "<li><span>Remove LICENSE.txt, it will be added by drupal.org packaging automatically.</span></li>"
 fi
 if [ -e LICENSE ]; then
-  echo "<li>Remove the LICENSE, drupal.org packaging will add a LICENSE.txt file automatically.</li>"
+  echo "<li><span>Remove the LICENSE, drupal.org packaging will add a LICENSE.txt file automatically.</span></li>"
 fi
 # translations folder present?
 if [ -d translations ]; then
-  echo "<li>Remove the translations folder, translations are done on http://localize.drupal.org</li>"
+  echo "<li><span>Remove the translations folder, translations are done on http://localize.drupal.org</span></li>"
 fi
 # .DS_Store present?
 CHECK_FILES=".DS_Store .idea node_modules .project .sass-cache .settings vendor"
 for FILE in $CHECK_FILES; do
   FOUND=`find . -name $FILE`
   if [ -n "$FOUND" ]; then
-    echo "<li>Remove all $FILE files from your repository.</li>"
+    echo "<li><span>Remove all $FILE files from your repository.</span></li>"
   fi
 done
 # Backup files present?
 BACKUP=`find . -name "*~"`
 if [ ! -z "$BACKUP" ]; then
-  echo "<li>Remove all backup files from your repository:"
+  echo "<li><span>Remove all backup files from your repository:</span>"
   echo "<code>"
   echo "$BACKUP"
   echo "</code></li>"
@@ -141,24 +141,24 @@ for FILE in $INFO_FILES; do
   # "version" in info file?
   grep -q -e "version[[:space:]]*=[[:space:]]*" $FILE
   if [ $? = 0 ]; then
-    echo "<li>Remove \"version\" from the $FILE file, it will be added by drupal.org packaging automatically.</li>"
+    echo "<li><span>Remove \"version\" from the $FILE file, it will be added by drupal.org packaging automatically.</span></li>"
   fi
   # "project" in info file?
   grep -q -e "project[[:space:]]*=[[:space:]]*" $FILE
   if [ $? = 0 ]; then
-    echo "<li>Remove \"project\" from the $FILE file, it will be added by drupal.org packaging automatically.</li>"
+    echo "<li><span>Remove \"project\" from the $FILE file, it will be added by drupal.org packaging automatically.</span></li>"
   fi
   # "datestamp" in info file?
   grep -q -e "datestamp[[:space:]]*=[[:space:]]*" $FILE
   if [ $? = 0 ]; then
-    echo "<li>Remove \"datestamp\" from the $FILE file, it will be added by drupal.org packaging automatically.</li>"
+    echo "<li><span>Remove \"datestamp\" from the $FILE file, it will be added by drupal.org packaging automatically.</span></li>"
   fi
 done
 
 # ?> PHP delimiter at the end of any file?
 BAD_LINES=`grep -l "^\?>" $NON_TPL_FILES`
 if [ $? = 0 ]; then
-  echo "<li>The \"?>\" PHP delimiter at the end of files is discouraged, see https://www.drupal.org/node/318#phptags"
+  echo "<li><span>The \"?>\" PHP delimiter at the end of files is discouraged, see https://www.drupal.org/node/318#phptags</span>"
   echo "<code>"
   echo "$BAD_LINES"
   echo "</code></li>"
@@ -169,7 +169,7 @@ CHECK_FILES=`echo "$PHP_FILES" | grep -v -E "(api\.php|drush\.inc)$"`
 for FILE in $CHECK_FILES; do
   FUNCTIONS=`grep -E "^function [[:alnum:]_]+.*\(.*\) \{" $FILE | grep -v -E "^function (_?$NAME|theme|template|phptemplate)"`
   if [ $? = 0 ]; then
-    echo "<li>$FILE: all functions should be prefixed with your module/theme name to avoid name clashes. See https://www.drupal.org/node/318#naming"
+    echo "<li><span>$FILE: all functions should be prefixed with your module/theme name to avoid name clashes. See https://www.drupal.org/node/318#naming</span>"
     echo "<code>"
     echo "$FUNCTIONS"
     echo "</code></li>"
@@ -181,7 +181,7 @@ BAD_LINES1=`file $FILES | grep "line terminators"`
 # we run this grep command in addition.
 BAD_LINES2=`grep -rlI $'\r' *`
 if [ -n "$BAD_LINES1" ] || [ -n "$BAD_LINES2" ]; then
-  echo "<li>Bad line endings were found, always use unix style terminators. See https://www.drupal.org/coding-standards#indenting"
+  echo "<li><span>Bad line endings were found, always use unix style terminators. See https://www.drupal.org/coding-standards#indenting</span>"
   echo "<code>"
   echo "$BAD_LINES1"
   echo "$BAD_LINES2"
@@ -190,7 +190,7 @@ fi
 # old CVS $Id$ tags
 BAD_LINES=`grep -rnI "\\$Id" *`
 if [ $? = 0 ]; then
-  echo "<li>Remove all old CVS \$Id tags, they are not needed anymore."
+  echo "<li><span>Remove all old CVS \$Id tags, they are not needed anymore.</span>"
   echo "<code>"
   echo "$BAD_LINES"
   echo "</code></li>"
@@ -206,19 +206,19 @@ done
 for FILE in $TEXT_FILES; do
   ERRORS=`grep ^$'\xEF\xBB\xBF' $FILE`
   if [ $? = 0 ]; then
-    echo "<li>$FILE: the byte order mark at the beginning of UTF-8 files is discouraged, you should remove it.</li>"
+    echo "<li><span>$FILE: the byte order mark at the beginning of UTF-8 files is discouraged, you should remove it.</span></li>"
   fi
 done
 
 # run drupalcs
-DRUPALCS=`phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md .`
+DRUPALCS=`/opt/pareviewsh/depedencies/PHP_CodeSniffer/scripts/phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md .`
 DRUPALCS_ERRORS=$?
 if [ $DRUPALCS_ERRORS = 1 ]; then
   LINES=`echo "$DRUPALCS" | wc -l`
   if [ $LINES -gt 20 ]; then
-    echo "<li><a href=\"https://www.drupal.org/project/coder\">Coder Sniffer</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/node/318\">Drupal coding standards</a>). See attachment.</li>"
+    echo "<li><span><a href=\"https://www.drupal.org/project/coder\">Coder Sniffer</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/node/318\">Drupal coding standards</a>). See attachment.</span></li>"
   else
-    echo "<li><a href=\"https://www.drupal.org/project/coder\">Coder Sniffer</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/node/318\">Drupal coding standards</a>)."
+    echo "<li><span><a href=\"https://www.drupal.org/project/coder\">Coder Sniffer</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/node/318\">Drupal coding standards</a>).</span>"
     echo "<code>"
     echo "$DRUPALCS"
     echo "</code></li>"
@@ -227,18 +227,18 @@ if [ $DRUPALCS_ERRORS = 1 ]; then
 fi
 
 # Run DrupalPractice
-DRUPALPRACTICE=`phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme .`
+DRUPALPRACTICE=`/opt/pareviewsh/depedencies/PHP_CodeSniffer/scripts/phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme .`
 if [ $? = 1 ]; then
-  echo "<li><a href=\"https://www.drupal.org/project/drupalpractice\">DrupalPractice</a> has found some issues with your code, but could be false positives."
+  echo "<li class='drupalpractice'><span><a href=\"https://www.drupal.org/project/drupalpractice\">DrupalPractice</a> has found some issues with your code, but could be false positives.</span>"
   echo "<code>"
   echo "$DRUPALPRACTICE"
   echo "</code></li>"
 fi
 
 # Run DrupalSecure
-DRUPALSECURE=`phpcs --standard=DrupalSecure --extensions=php,module,inc,install,test,profile,theme .`
+DRUPALSECURE=`/opt/pareviewsh/depedencies/PHP_CodeSniffer/scripts/phpcs --standard=DrupalSecure --extensions=php,module,inc,install,test,profile,theme .`
 if [ $? = 1 ]; then
-  echo "<li><a href=\"https://www.drupal.org/sandbox/coltrane/1921926\">DrupalSecure</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/writing-secure-code\">Writing secure core</a> handbook)."
+  echo "<li class='drupalsecure'><span><a href=\"https://www.drupal.org/sandbox/coltrane/1921926\">DrupalSecure</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/writing-secure-code\">Writing secure core</a> handbook).</span>"
   echo "<code>"
   echo "$DRUPALSECURE"
   echo "</code></li>"
@@ -250,7 +250,7 @@ if [ $? = 0 ]; then
   # Run codespell.
   SPELLING=`codespell -d . 2>/dev/null`
   if [ ! -z "$SPELLING" ]; then
-    echo "<li><a href=\"https://github.com/lucasdemarchi/codespell\">Codespell</a> has found some spelling errors in your code."
+    echo "<li class='codespell'><span><a href=\"https://github.com/lucasdemarchi/codespell\">Codespell</a> has found some spelling errors in your code.</span>"
     echo "<code>"
     echo "$SPELLING"
     echo "</code></li>"
@@ -262,16 +262,16 @@ D7_TEST_FILES=`find . -name \*\.test`
 D8_TEST_DIRS=`find . -type d \( -iname test -or -iname tests \)`
 # Do not throw this error for themes, they usually don't have tests.
 if [ -z "$D7_TEST_FILES" ] && [ -z "$D8_TEST_DIRS" ] && [ ! -e template.php ] && [ ! -e *.theme ] ; then
-  echo "<li>No automated test cases were found, did you consider writing <a href=\"https://www.drupal.org/simpletest\">Simpletests</a> or <a href=\"https://www.drupal.org/phpunit\">PHPUnit tests</a>? This is not a requirement but encouraged for professional software development.</li>"
+  echo "<li class='tests'><span>No automated test cases were found, did you consider writing <a href=\"https://www.drupal.org/simpletest\">Simpletests</a> or <a href=\"https://www.drupal.org/phpunit\">PHPUnit tests</a>? This is not a requirement but encouraged for professional software development.</span></li>"
 fi
 
 echo "</ul>"
 
-echo "<i>This automated report was generated with <a href=\"https://www.drupal.org/project/pareviewsh\">PAReview.sh</a>, your friendly project application review script. You can also use the <a href=\"http://pareview.sh\">online version</a> to check your project. You have to get a <a href=\"https://www.drupal.org/node/1975228\">review bonus</a> to get a review from me.</i>"
+#echo "<i>This automated report was generated with <a href=\"https://www.drupal.org/project/pareviewsh\">PAReview.sh</a>, your friendly project application review script. You can also use the <a href=\"http://pareview.sh\">online version</a> to check your project. You have to get a <a href=\"https://www.drupal.org/node/1975228\">review bonus</a> to get a review from me.</i>"
 
 if [[ $DRUPALCS_ERRORS = 1 ]]; then
-  echo -e "\n\n\n"
-  echo "<code>"
+  #echo -e "\n\n\n"
+  echo "<code id='report-full'>"
   if [ -n "$DRUPALCS" ]; then
     echo "$DRUPALCS"
   fi
