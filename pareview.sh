@@ -211,7 +211,7 @@ for FILE in $TEXT_FILES; do
 done
 
 # run drupalcs
-DRUPALCS=`phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md .`
+DRUPALCS=`phpcs --standard=Drupal --report=gitlc --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md .`
 DRUPALCS_ERRORS=$?
 if [ $DRUPALCS_ERRORS = 1 ]; then
   LINES=`echo "$DRUPALCS" | wc -l`
@@ -227,7 +227,7 @@ if [ $DRUPALCS_ERRORS = 1 ]; then
 fi
 
 # Run DrupalPractice
-DRUPALPRACTICE=`phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme .`
+DRUPALPRACTICE=`phpcs --standard=DrupalPractice --report=gitlc --extensions=php,module,inc,install,test,profile,theme .`
 if [ $? = 1 ]; then
   echo "<li class='drupalpractice'><span><a href=\"https://www.drupal.org/project/drupalpractice\">DrupalPractice</a> has found some issues with your code, but could be false positives.</span>"
   echo "<code>"
@@ -236,7 +236,7 @@ if [ $? = 1 ]; then
 fi
 
 # Run DrupalSecure
-DRUPALSECURE=`phpcs --standard=DrupalSecure --extensions=php,module,inc,install,test,profile,theme .`
+DRUPALSECURE=`phpcs --standard=DrupalSecure --report=gitlc --extensions=php,module,inc,install,test,profile,theme .`
 if [ $? = 1 ]; then
   echo "<li class='drupalsecure'><span><a href=\"https://www.drupal.org/sandbox/coltrane/1921926\">DrupalSecure</a> has found some issues with your code (please check the <a href=\"https://www.drupal.org/writing-secure-code\">Writing secure core</a> handbook).</span>"
   echo "<code>"
