@@ -4,85 +4,18 @@
 
 if [[ $# -lt 1 || $1 == "--help" || $1 == "-h" ]]
 then
-  echo "Usage:    `basename $0` GIT-URL [BRANCH]"
+  echo "Usage:"
   echo "          `basename $0` DIR-PATH"
   echo "Examples:"
-  echo "  `basename $0` http://git.drupal.org/project/rules.git"
-  echo "  `basename $0` http://git.drupal.org/project/rules.git 6.x-1.x"
   echo "  `basename $0` sites/all/modules/rules"
+  echo "  `basename $0` sites/all/modules/rules [STANDARD]"
+  echo "  `basename $0` sites/all/modules/rules Drupal"
   exit
 fi
 
 # check if the first argument is valid directory.
 if [ -d $1 ]; then
  cd $1
-# otherwise treat the user input as git URL.
-else
-  if [ -d pareview_temp ]; then
-    # clean up test dir
-    rm -rf pareview_temp
-  else
-    mkdir pareview_temp
-  fi
-
-  # clone project quietly
-  git clone -q $1 pareview_temp &> /dev/null
-  if [ $? -ne 0 ]; then
-    echo "Git clone failed. Aborting."
-    exit 1
-  fi
-  cd pareview_temp
-
-  # Check if a default branch is checked out.
-  BRANCH_NAME=`git branch`
-  if [ -z "$BRANCH_NAME" ]; then
-    echo "Git default branch is not set, see <a href=\"https://www.drupal.org/node/1659588\">the documentation on setting a default branch</a>."
-  fi
-
-  # checkout branch
-  # check if a branch name was passed on the command line
-  if [ $2 ]; then
-    BRANCH_NAME=$2
-    git checkout -q $BRANCH_NAME &> /dev/null
-    if [ $? = 1 ]; then
-      echo "Git checkout of branch $BRANCH_NAME failed. Aborting."
-      exit 1
-    fi
-  else
-    # First try ?.x-?.x. We want to get the highest core compatibility number,
-    # i.e. 8.x-1.x before 7.x-1.x. So we take the last match.
-    BRANCH_NAME=`git branch -a | grep -o -E "[0-9]\.x-[0-9]\.x$" | tail -n1`
-    if [ -n "$BRANCH_NAME" ]; then
-      git checkout -q $BRANCH_NAME &> /dev/null
-    else
-      BRANCH_NAME=`git branch -a | sed -e 's/ *remotes\/origin\///p' | tail -n1`
-      echo "It appears you are working in the \"$BRANCH_NAME\" branch in git. You should really be working in a version specific branch. The most direct documentation on this is <a href=\"https://www.drupal.org/node/1127732\">Moving from a master branch to a version branch.</a> For additional resources please see the documentation about <a href=\"https://www.drupal.org/node/1015226\">release naming conventions</a> and <a href=\"https://www.drupal.org/node/1066342\">creating a branch in git</a>."
-    fi
-  fi
-  if [ $BRANCH_NAME != "master" ]; then
-    # Check that there is no master branch.
-    MASTER_BRANCH=`git branch -a | grep -E "^  remotes/origin/master$"`
-    if [ $? = 0 ]; then
-      echo "There is still a master branch, make sure to set the correct default branch: https://www.drupal.org/node/1659588 . Then remove the master branch, see also step 6 and 7 in https://www.drupal.org/node/1127732"
-    fi
-    git checkout -q $BRANCH_NAME &> /dev/null
-  fi
-  TAG_CLASH=`git tag -l | grep $BRANCH_NAME`
-  if [ $? = 0 ]; then
-    echo "There is a git tag that has the same name as the branch $BRANCH_NAME. Make sure to remove this tag to avoid confusion."
-    exit 1
-  fi
-  # Check that no branch patterns with the suffix "dev" are used.
-  # Check also that no tag name patterns are used as branches.
-  BRANCH_ERRORS=`git branch -a | grep -E "([0-9]\.x-[0-9]\.x-dev$|[0-9]\.[0-9]-[0-9]\.x$|[0-9]\.x-[0-9]\.[0-9]$|[0-9]\.[0-9]-[0-9]\.[0-9]$)"`
-  if [ $? = 0 ]; then
-    echo "The following git branches do not match the release branch pattern, you should remove/rename them. See https://www.drupal.org/node/1015226"
-    echo "<code>"
-    echo "$BRANCH_ERRORS"
-    echo "</code>"
-  fi
-  BRANCH_VERSION=`git rev-parse --short HEAD`
-  echo "Review of the $BRANCH_NAME branch (commit $BRANCH_VERSION):"
 fi
 
 # Get module/theme name.
