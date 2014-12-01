@@ -8,8 +8,6 @@ then
   echo "          `basename $0` DIR-PATH"
   echo "Examples:"
   echo "  `basename $0` sites/all/modules/rules"
-  echo "  `basename $0` sites/all/modules/rules [STANDARD]"
-  echo "  `basename $0` sites/all/modules/rules Drupal"
   exit
 fi
 
