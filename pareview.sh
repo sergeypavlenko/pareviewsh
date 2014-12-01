@@ -36,7 +36,6 @@ if [ -z "$PHP_FILES" ]; then
   CODE_FILES="."
   NON_TPL_FILES="."
 fi
-echo "<ul class='reports'>"
 
 # README.txt present?
 if [ ! -e README.txt ] && [ ! -e README.md ] ; then
@@ -197,8 +196,6 @@ D8_TEST_DIRS=`find . -type d \( -iname test -or -iname tests \)`
 if [ -z "$D7_TEST_FILES" ] && [ -z "$D8_TEST_DIRS" ] && [ ! -e template.php ] && [ ! -e *.theme ] ; then
   echo "<li class='tests'><span>No automated test cases were found, did you consider writing <a href=\"https://www.drupal.org/simpletest\">Simpletests</a> or <a href=\"https://www.drupal.org/phpunit\">PHPUnit tests</a>? This is not a requirement but encouraged for professional software development.</span></li>"
 fi
-
-echo "</ul>"
 
 #echo "<i>This automated report was generated with <a href=\"https://www.drupal.org/project/pareviewsh\">PAReview.sh</a>, your friendly project application review script. You can also use the <a href=\"http://pareview.sh\">online version</a> to check your project. You have to get a <a href=\"https://www.drupal.org/node/1975228\">review bonus</a> to get a review from me.</i>"
 
